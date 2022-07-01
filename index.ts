@@ -37,19 +37,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const output = document.getElementById('output')!
   const txtSend = document.getElementById('txt_send')! as HTMLInputElement
   const btnSend = document.getElementById('btn_send')! as HTMLButtonElement
-
+  btnSend.disabled = false
   chat.textContent = ''
   output.textContent = ''
 
-  function addChatLine (txt: string) {
-    const now = new Date().toLocaleTimeString()
-    chat.textContent += `[${now}] ${txt}\n`
-  }
+  // Peers data
+  let remotePeer: PeerInfo | null
+  let listOfKnownRemotePeer : PeerInfo[]
+  listOfKnownRemotePeer = []
+  
 
-  function log (txt: string) {
-    console.info(txt)
-    output.textContent += `${txt.trim()}\n`
-  }
 
   // Add the signaling server address, along with our PeerId to our multiaddrs list
   // libp2p will automatically attempt to dial to the signaling server so that it can
@@ -57,13 +54,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const webrtcAddr = '/ip4/127.0.0.1/tcp/8001/wss/p2p-webrtc-star'
   libp2p.peerInfo.multiaddrs.add(multiaddr(webrtcAddr))
 
+
+  // Listening for new connections to peers
   // Listen for new peers
   libp2p.on('peer:discovery', (peerInfo: PeerInfo) => {
     log(`Found peer ${peerInfo.id.toB58String()}`)
   })
-
-  // Listen for new connections to peers
-  let remotePeer: PeerInfo | null
 
   libp2p.on('peer:connect', (peerInfo: PeerInfo) => {
     log(`Connected to ${peerInfo.id.toB58String()}`)
@@ -72,7 +68,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Dial was successful, meaning that the other end can speak our
       // protocol. Capture the peerInfo so that we can send messages later on.
       remotePeer = peerInfo
-      btnSend.disabled = false
+      listOfKnownRemotePeer.push(peerInfo)
+      console.log("listOfKnownRemotePeers : ", listOfKnownRemotePeer)
     })
   })
 
@@ -82,6 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   })
 
   await libp2p.start()
+
   status.innerText = 'libp2p started!'
   log(`libp2p id is ${libp2p.peerInfo.id.toB58String()}`)
 
@@ -111,7 +109,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (remotePeer) {
       const value = txtSend.value
       txtSend.value = ''
-      sendMessage(remotePeer, value)
+      //Sending message to everyone
+      for (let peer of listOfKnownRemotePeer){
+        console.log("Sending to peer : ", peer)
+        sendMessage(peer, value)
+      }
+      //Sending message to only one peer
+      //sendMessage(remotePeer, value)
       addChatLine(`me: ${value}`)
     }
   }
@@ -124,6 +128,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       log('Send failed; please check console for details.')
       console.error('Could not send the message', err)
     }
+  }
+
+  //Chatting and logging 
+  function addChatLine (txt: string) {
+    const now = new Date().toLocaleTimeString()
+    chat.textContent += `[${now}] ${txt}\n`
+  }
+
+  function log (txt: string) {
+    console.info(txt)
+    output.textContent += `${txt.trim()}\n`
   }
 
   // Export libp2p and send to the window so you can play with the API
