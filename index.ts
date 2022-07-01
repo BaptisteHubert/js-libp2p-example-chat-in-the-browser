@@ -24,23 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     modules: {
       transport: [Websockets, WebRTCStar],
       connEncryption: [Secio],
-      streamMuxer: [Mplex],
-      peerDiscovery: [Boostrap]
-    },
-    config: {
-      peerDiscovery: {
-        bootstrap: {
-          enabled: true,
-          list: [
-            '/dns4/ams-1.bootstrap.libp2p.io/tcp/443/wss/p2p/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd',
-            '/dns4/lon-1.bootstrap.libp2p.io/tcp/443/wss/p2p/QmSoLMeWqB7YGVLJN3pNLQpmmEk35v6wYtsMGLzSr5QBU3',
-            '/dns4/sfo-3.bootstrap.libp2p.io/tcp/443/wss/p2p/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM',
-            '/dns4/sgp-1.bootstrap.libp2p.io/tcp/443/wss/p2p/QmSoLSafTMBsPKadTEgaXctDQVcqN88CNLHXMkTNwMKPnu',
-            '/dns4/nyc-1.bootstrap.libp2p.io/tcp/443/wss/p2p/QmSoLueR4xBeUbY9WZ9xGUUxunbKWcrNFTDAadQJmocnWm',
-            '/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/p2p/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64'
-          ]
-        }
-      }
+      streamMuxer: [Mplex]
     }
   })
 
@@ -70,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Add the signaling server address, along with our PeerId to our multiaddrs list
   // libp2p will automatically attempt to dial to the signaling server so that it can
   // receive inbound connections from other peers
-  const webrtcAddr = '/ip4/0.0.0.0/tcp/9090/wss/p2p-webrtc-star'
+  const webrtcAddr = '/ip4/127.0.0.1/tcp/8001/wss/p2p-webrtc-star'
   libp2p.peerInfo.multiaddrs.add(multiaddr(webrtcAddr))
 
   // Listen for new peers
