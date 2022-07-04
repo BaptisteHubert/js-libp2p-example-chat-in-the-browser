@@ -15,6 +15,7 @@ declare global {
   interface Window {
     libp2p: Libp2p
     send: (event: KeyboardEvent | MouseEvent) => void
+    sendToRandomOrEveryone: (event : MouseEvent) => void
   }
 }
 
@@ -45,6 +46,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   let remotePeer: PeerInfo | null
   let listOfKnownRemotePeer : PeerInfo[]
   listOfKnownRemotePeer = []
+  let sendingOptions : string
+  sendingOptions = "everyone"
+  document.getElementById('sendingOptions').innerHTML = sendingOptions
   
 
 
@@ -109,13 +113,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (remotePeer) {
       const value = txtSend.value
       txtSend.value = ''
-      //Sending message to everyone
-      for (let peer of listOfKnownRemotePeer){
-        console.log("Sending to peer : ", peer)
-        sendMessage(peer, value)
+
+      if (sendingOptions == "everyone"){
+        //Sending message to everyone
+        for (let peer of listOfKnownRemotePeer){
+          console.log("Sending to peer : ", peer)
+          sendMessage(peer, value)
+        }
+      } else {
+          //Choosing a random value in the known peers list
+          const random = Math.floor(Math.random() * listOfKnownRemotePeer.length);
+          //Sending message to a random peer in the know peer values
+          sendMessage(listOfKnownRemotePeer[random], value)
       }
-      //Sending message to only one peer
-      //sendMessage(remotePeer, value)
       addChatLine(`me: ${value}`)
     }
   }
@@ -128,6 +138,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       log('Send failed; please check console for details.')
       console.error('Could not send the message', err)
     }
+  }
+
+  function sendToRandomOrEveryone(){
+    if (sendingOptions == "everyone"){
+      sendingOptions = "random"
+    } else if (sendingOptions == "random") {
+        sendingOptions = "everyone"
+    }
+    document.getElementById('sendingOptions').innerHTML = sendingOptions
   }
 
   //Chatting and logging 
@@ -144,4 +163,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Export libp2p and send to the window so you can play with the API
   window.libp2p = libp2p
   window.send = send
+  window.sendToRandomOrEveryone = sendToRandomOrEveryone
 })

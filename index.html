@@ -13,9 +13,14 @@
 
     <chat>
       <input id="txt_send" type="text" onkeyup="send(event)" />
-      <button id="btn_send" onclick="send()" disabled>Send</button>
+      <button id="btn_send" onclick="send()">Send</button>
       <pre id="chat"></pre>
     </chat>
+
+    <options>
+      <button id="btn_EveryoneRandom" onclick="sendToRandomOrEveryone()">Change sending strategy</button>
+      <p>You are sending the text to</p><p id = sendingOptions></p>
+    </options>
 
     <main>
       <h2>Log</h2>
