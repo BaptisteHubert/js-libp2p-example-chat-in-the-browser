@@ -18,9 +18,19 @@
     </chat>
 
     <options>
-      <button id="btn_EveryoneRandom" onclick="sendToRandomOrEveryone()">Change sending strategy</button>
-      <p>You are sending the text to</p><p id = sendingOptions></p>
+      <button id="btn_everyoneOrRandom" onclick="sendToEveryoneOrRandom()">Change sending strategy</button>
+      <div style="display: flex;">
+        <p>You are sending the text to :&nbsp;</p><p id = sendingOptions> </p>
+      </div>
     </options>
+
+    <bot>
+      
+      <button id="btn_addBot" onclick="addBot()">Add a bot</button>
+      <div style="display: flex;">
+      <p>Number of bots on this session :&nbsp;</p> <p id = numberOfBots></p>
+      </div>
+    </bot>
 
     <main>
       <h2>Log</h2>

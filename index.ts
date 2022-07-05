@@ -15,7 +15,9 @@ declare global {
   interface Window {
     libp2p: Libp2p
     send: (event: KeyboardEvent | MouseEvent) => void
-    sendToRandomOrEveryone: (event : MouseEvent) => void
+    sendToEveryoneOrRandom: (event : MouseEvent) => void
+    addBot: (event : MouseEvent) => void
+
   }
 }
 
@@ -49,6 +51,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   let sendingOptions : string
   sendingOptions = "everyone"
   document.getElementById('sendingOptions').innerHTML = sendingOptions
+  let numberOfBots = 0
+  document.getElementById('numberOfBots').innerHTML = numberOfBots
   
 
 
@@ -67,6 +71,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   libp2p.on('peer:connect', (peerInfo: PeerInfo) => {
     log(`Connected to ${peerInfo.id.toB58String()}`)
+    console.log("TEST BONJOUR")
+    console.log(peerInfo)
     libp2p.dialProtocol(peerInfo, [protocol]).then(() => {
       log('dialed a stream')
       // Dial was successful, meaning that the other end can speak our
@@ -83,6 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   })
 
   await libp2p.start()
+  console.log("Our libp2p : ", libp2p)
 
   status.innerText = 'libp2p started!'
   log(`libp2p id is ${libp2p.peerInfo.id.toB58String()}`)
@@ -140,13 +147,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  function sendToRandomOrEveryone(){
+  function sendToEveryoneOrRandom(){
     if (sendingOptions == "everyone"){
       sendingOptions = "random"
     } else if (sendingOptions == "random") {
         sendingOptions = "everyone"
     }
     document.getElementById('sendingOptions').innerHTML = sendingOptions
+  }
+
+
+
+  async function addBot(){
+    const libp2pNodeBot = await Libp2p.create({
+      modules: {
+        transport: [Websockets, WebRTCStar],
+        connEncryption: [Secio],
+        streamMuxer: [Mplex]
+      },
+      Peerid : "test"
+    })
+
+    libp2pNodeBot.peerInfo.multiaddrs.add(multiaddr(webrtcAddr))
+    await libp2pNodeBot.start()
+    console.log("created : ", libp2pNodeBot)
+
+    numberOfBots ++
+    document.getElementById('numberOfBots').innerHTML = numberOfBots
   }
 
   //Chatting and logging 
@@ -163,5 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Export libp2p and send to the window so you can play with the API
   window.libp2p = libp2p
   window.send = send
-  window.sendToRandomOrEveryone = sendToRandomOrEveryone
+  window.sendToEveryoneOrRandom = sendToEveryoneOrRandom
+  window.addBot = addBot
+
 })
